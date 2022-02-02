@@ -1,6 +1,6 @@
 # CTF-Writeups
 write-ups on CTF's I have solved
-### h0w d0 ! h4CK
+### h0w h4ck
 
         .--.       .--.
     _  `    \     /    `  _
