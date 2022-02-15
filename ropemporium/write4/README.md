@@ -228,7 +228,6 @@ So let's set up the stack accordingly:
 	_______________________________________
 	ebp 
 	 = "flag"
-	 = "galf"
 	_______________________________________
 	eip = &uG
 	 = 0x08048543 
@@ -280,7 +279,6 @@ Can we use the same ROP gadgets??
 	_______________________________________
 	ebp 
 	 = "flag"				 4B
-	 = "galf"
 	_______________________________________
 	eip = &uG
 	 = 0x08048543 				 4B
@@ -296,8 +294,7 @@ Can we use the same ROP gadgets??
 	 = "\x1c\xa0\x04\x08"
 	_______________________________________
 	ebp
-	 = ".txt"
-	 = "txt."				 4B
+	 = ".txt"				 4B
 	_______________________________________
 	eip = &usefulGadget
 	 = 0x08048543 
@@ -343,7 +340,6 @@ So, now we set up the stack so that it has those addresses on it, which will be 
 	_______________________________________
 	ebp 
 	 = "flag"				 4B
-	 = "galf" (gotta love endian-ness)
 	_______________________________________
 	eip = &usefulGadget
 	 = 0x08048543 				 4B
@@ -360,7 +356,6 @@ So, now we set up the stack so that it has those addresses on it, which will be 
 	_______________________________________
 	ebp 
 	 = ".txt"				 4B
-	 = "txt."
 	_______________________________________
 	eip = &usefulGadget
 	 = 0x08048543 				 4B
