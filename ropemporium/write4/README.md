@@ -372,7 +372,7 @@ Now that I have endured a bit of masochism by manually creating my input file, I
 
 (it does):
 
-	$ python3 pwny.py
+	$ python3 write432.py
 	[*] '/home/ubuntu/ropemporium/write4/write432'
 	    Arch:     i386-32-little
 	    RELRO:    Partial RELRO
@@ -392,7 +392,7 @@ Now that I have endured a bit of masochism by manually creating my input file, I
 
 Here's what it looks like:
 
-	$ cat pwny.py
+	$ cat write432.py
 	
 	from pwn import *
 	from pprint import pprint
