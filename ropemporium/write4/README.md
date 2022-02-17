@@ -10,31 +10,31 @@ Read about it [here](https://ropemporium.com/challenge/write4.html)
 # Identifying and Analyzing Functions
 First, let's look at functions imported from shared libraries:
 ```sh
-	rabin2 -i write432
+rabin2 -i write432
 
-	[Imports]
-	nth vaddr      bind   type   lib name
-	―――――――――――――――――――――――――――――――――――――
-	1   0x080483b0 GLOBAL FUNC       pwnme
-	2   0x00000000 WEAK   NOTYPE     __gmon_start__
-	3   0x080483c0 GLOBAL FUNC       __libc_start_main
-	4   0x080483d0 GLOBAL FUNC       print_file
+[Imports]
+nth vaddr      bind   type   lib name
+―――――――――――――――――――――――――――――――――――――
+1   0x080483b0 GLOBAL FUNC       pwnme
+2   0x00000000 WEAK   NOTYPE     __gmon_start__
+3   0x080483c0 GLOBAL FUNC       __libc_start_main
+4   0x080483d0 GLOBAL FUNC       print_file
 ```
 
 Now, let's look at innate functions: 
 	
 ```sh
-	rabin2 -qs write432 | grep -ve imp -e ' 0 '
+rabin2 -qs write432 | grep -ve imp -e ' 0 '
 
-	0x080485cc 4 _IO_stdin_used
-	0x0804a020 1 completed.7283
-	0x0804852a 25 usefulFunction
-	0x080485b0 2 __libc_csu_fini
-	0x08048440 4 __x86.get_pc_thunk.bx
-	0x08048550 93 __libc_csu_init
-	0x08048430 2 _dl_relocate_static_pie
-	0x080485c8 4 _fp_hw
-	0x08048506 36 main
+0x080485cc 4 _IO_stdin_used
+0x0804a020 1 completed.7283
+0x0804852a 25 usefulFunction
+0x080485b0 2 __libc_csu_fini
+0x08048440 4 __x86.get_pc_thunk.bx
+0x08048550 93 __libc_csu_init
+0x08048430 2 _dl_relocate_static_pie
+0x080485c8 4 _fp_hw
+0x08048506 36 main
 ```
 
 Let's also use pwntools to see if there are any functions that we haven't identified with these 2 commands:
