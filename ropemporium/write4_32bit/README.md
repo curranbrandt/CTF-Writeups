@@ -1,5 +1,5 @@
 # GIST
-The goal of this exercise is to create a slightly more advanced ROP chain, using ROP gadgets to inject data into memory using the stack, and then pass those values as arguments into a function call.
+The goal of this exercise is to create a slightly more advanced ROP chain, using ROP gadgets to inject data into memory using the stack, and then pass those values as arguments to a function call.
 
 # Link
 Read about it [here](https://ropemporium.com/challenge/write4.html)
