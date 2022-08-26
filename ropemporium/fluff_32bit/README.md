@@ -1,5 +1,5 @@
 # GIST
-The goal of this exercise is to use unconventional, or "questionable" ROP gadgets in to set up a ROP chain and call a function with customized parameters in order to capture the flag. This exercise is built off of previous exercises available via the links below.
+The goal of this exercise is to use unconventional, or "questionable" ROP gadgets in order to set up a ROP chain and call a function with customized parameters that spits out the flag. This exercise is built off of previous exercises available via the links below.
 
 # Links
 Previous challenge: [badchars](https://github.com/curranbrandt/CTF-Writeups/tree/main/ropemporium/badchars_32bit)
@@ -35,7 +35,7 @@ Now, let's look at innate functions:
 ```
 
 
-Let's also use ipython3 to see if there are any functions that we haven't identified with these 2 commands:
+Let's also use ipython3 to see if there are any functions that we haven't identified with the 2 previous commands:
 
 ```python
 In [1]: from pwn import *                                                                                       
@@ -48,7 +48,7 @@ questionableGadgets
 }	
 ```
 
-So, this time around we have "questionable" gadgets. This will be fun.
+So, this time around we have a function that contains "questionable" gadgets. This will be fun.
 
 Let's look at them in gdb:
 
@@ -86,16 +86,16 @@ End of assembler dump.
 0x08048543 <+0>:	mov    eax,ebp
 ```
 
-we can control ehat's in eax, 
- = we can control what our mask is for pext
+we can control what's in eax, 
+ therefore we can control what our mask is for pext
  
 
 ```asm
 0x08048545 <+2>:	mov    ebx,0xb0bababa
 ```
 
-We cannot control what our src1 is for pext
-program then moves 0xdeadbeef, so a garbage value, into eax, so that we no longer have control over it
+We cannot control what our src1 is for pext (it is set to 0xb0bababa by the mov instruction).
+The program then moves 0xdeadbeef, so a garbage value, into eax, so that we no longer have control over it
 
 
 So, we can control our mask, which means we should be able to control what value goes into edx
