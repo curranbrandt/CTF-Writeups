@@ -505,8 +505,12 @@ payload = b"".join(payload)
 
 p.send(payload)
 
-p.interactive()
+p.recvline()
+flag = p.recvline()
+flag = flag.decode('UTF-8')
+print("flag is: " , flag)
 p.close()
+
 
 ```
 
