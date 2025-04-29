@@ -1,5 +1,0 @@
-# blukat
-
-
-![](resources/blukat.png)
-
